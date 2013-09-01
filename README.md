@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Carreau/difflib2.py.png?branch=master)](https://travis-ci.org/Carreau/difflib2.py)
+
 # Difflib2
 
 > A surpriseless alternative to difflib.
