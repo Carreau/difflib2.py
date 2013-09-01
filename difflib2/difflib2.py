@@ -119,14 +119,14 @@ def _backtrack(C, X, Y,  ii=None, jj=None):
     if ii == -1 or jj == -1:
         return []
     elif X[ii] == Y[jj]:
-        p = backtrack(C ,X, Y, ii-1, jj-1)
+        p = _backtrack(C ,X, Y, ii-1, jj-1)
         p.append((ii,jj))
         return p
     else:
         if C[ii][jj-1] > C[ii-1][jj]:
-            return backtrack(C, X, Y, ii, jj-1)
+            return _backtrack(C, X, Y, ii, jj-1)
         else:
-            return backtrack(C, X, Y, ii-1, jj)
+            return _backtrack(C, X, Y, ii-1, jj)
 
 def lcs(s1, s2):
     """
