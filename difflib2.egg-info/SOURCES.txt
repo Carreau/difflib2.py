@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+difflib2/__init__.py
+difflib2.egg-info/PKG-INFO
+difflib2.egg-info/SOURCES.txt
+difflib2.egg-info/dependency_links.txt
+difflib2.egg-info/entry_points.txt
+difflib2.egg-info/top_level.txt
+difflib2.egg-info/zip-safe
