@@ -127,3 +127,27 @@ def _backtrack(C, X, Y,  ii=None, jj=None):
             return backtrack(C, X, Y, ii, jj-1)
         else:
             return backtrack(C, X, Y, ii-1, jj)
+
+def lcs(s1, s2):
+    """
+    return the longuest common subsequence of the 2 sequences.
+    
+    if both are string return the lcs as a string
+    if both are unicode return the lcs as unicode
+    
+    Otherwise, return the lcs as a list.
+    """
+    arestring = (type(s1) is str) and (type(s2) is str)
+    areunicode = (type(s1) is unicode) and (type(s2) is unicode)
+    
+    C = lcsmatrix(s1,s2)
+    ig = backtrack(C, s1, s2)
+    i1, i2 = zip(*ig)
+    
+    lcs = [s1[i] for i in i1]
+    
+    if areunicode :
+       return  u''.join(lcs)
+    if arestring:
+        return ''.join(lcs)
+    return lcs
