@@ -4,13 +4,14 @@
 difflib2 : a surpriseless difflib for developper.
 
 difflib does not attempt to be smart, or to assume
-what you will diff is either source-code or string. 
+what you will diff is either source-code or string.
 
 
+Acronyms : lcs/LCS - Longest common subsequence.
 """
 
 
-def lcsmatrix(s1, s2):
+def lcs_matrix(s1, s2):
     """ Compute the lcs matrix for s1 vs s2
 
     s1 : sequence (of len m)
@@ -24,25 +25,28 @@ def lcsmatrix(s1, s2):
 
     lcs_matrix is returned without the 0-padded row.
 
-    >>> lcsmatrix('abc','bacd')
+    >>> lcs_matrix('abc','bacd')
     [[0, 1, 0, 0],
      [1, 1, 1, 1],
      [1, 1, 2, 2]]
 
+    If you are not dooing fancy things this is probably not what you are
+    looking for.
+
     """
     m = len(s1)
-    n = len(s2) 
+    n = len(s2)
     mtx = [[0 for x in range(n)] for y in range(m)]
 
     for i,c1 in enumerate(s1):
-        for j,c2 in enumerate(s2): 
-            if c1 == c2 : 
+        for j,c2 in enumerate(s2):
+            if c1 == c2 :
                 if i == 0 or j == 0:
                     mtx[i][j] = 1
                 else:
                     mtx[i][j] = mtx[i-1][j-1]+1
             else :
-                if i == 0: 
+                if i == 0:
                     mtx[i][j] = 0
                 elif j == 0:
                     mtx[i][j] = mtx[i-1][j]
@@ -51,8 +55,8 @@ def lcsmatrix(s1, s2):
     return mtx
 
 
-def lcs_low_m(s1, s2):
-    """ return len of the lcs of s1 and  s2
+def lcs_len(s1, s2):
+    """ return lenght of the lcs of s1 and  s2
     
     s1 : sequence , (len = n)
     s2 : sequence , (len = m)
@@ -61,13 +65,16 @@ def lcs_low_m(s1, s2):
     CPU time O(m.n)
 
     Usually faster than computing the full lcs matrix.
-    And generaly best algorythm to use if you are only interested
-    in the edit distance, and are working with relatively short sequences, 
+    And generally best algorithm to use if you are only interested
+    in the edit distance, and are working with relatively short sequences,
     without knowing specific property of your alphabet...
     """
     
     m = len(s1)
-    n = len(s2) 
+    n = len(s2)
+
+    if n == 0 or m == 0:
+        return 0
     
     # one can be smarter by storing only n+1 element
     # but the hevy use of modulo slow thig down a lot.
@@ -77,14 +84,14 @@ def lcs_low_m(s1, s2):
     
     for i,c1 in enumerate(s1):
         rngc, rngp = rngp, rngc
-        for j,c2 in enumerate(s2): 
-            if c1 == c2 : 
+        for j,c2 in enumerate(s2):
+            if c1 == c2 :
                 if i == 0 or j == 0:
                     rngc[j] = 1
                 else:
                     rngc[j] = rngp[j-1]+1
             else :
-                if i == 0: 
+                if i == 0:
                     rngc[j] = 0
                 elif j == 0:
                     rngc[j] = rngp[j]
@@ -96,13 +103,13 @@ def lcs_low_m(s1, s2):
 
 
 def backtrack(C, X, Y):
-    """ backtrack a lcs matrix to get one of the LCS
+    """ backtrack a lcs matrix to get **one** of the LCS
 
     C : lcs matrix
     X : sequence 1
     Y : sequence 2
     
-    Again, not the more efficient if you are interested in the lcs. 
+    Again, not the more efficient if you are interested in the lcs.
     """
     return _backtrack(C, X, Y)
 
@@ -130,24 +137,64 @@ def _backtrack(C, X, Y,  ii=None, jj=None):
 
 def lcs(s1, s2):
     """
-    return the longuest common subsequence of the 2 sequences.
+    return the longest common subsequence of the 2 sequences.
     
-    if both are string return the lcs as a string
-    if both are unicode return the lcs as unicode
+    If both are string return the lcs as a string
+    If both are Unicode return the lcs as Unicode
     
     Otherwise, return the lcs as a list.
     """
     arestring = (type(s1) is str) and (type(s2) is str)
     areunicode = (type(s1) is unicode) and (type(s2) is unicode)
     
-    C = lcsmatrix(s1,s2)
+    C = lcs_matrix(s1,s2)
     ig = backtrack(C, s1, s2)
-    i1, i2 = zip(*ig)
+    if ig:
+        i1, i2 = zip(*ig)
+        lcs = [s1[i] for i in i1]
+    else:
+        lcs =[]
     
-    lcs = [s1[i] for i in i1]
     
     if areunicode :
        return  u''.join(lcs)
     if arestring:
         return ''.join(lcs)
     return lcs
+
+
+from collections import namedtuple
+
+_lcs = namedtuple('LCS',('length','lcs'))
+
+def lcs_low_m_anlcs(s1, s2):
+    """compute the lcs len, and one of the lcs at the same time"""
+    
+    m = len(s1)
+    n = len(s2)
+    
+    rngc = [None for x in range(n)] ## current row
+    rngp = [None for x in range(n)] ## previous row
+    
+    for i,c1 in enumerate(s1):
+        rngc, rngp = rngp, rngc
+        for j,c2 in enumerate(s2):
+            if c1 == c2 :
+                if i == 0 or j == 0:
+                    rngc[j] = (1,[c1])
+                else:
+                    tmp = list(rngp[j-1][1])
+                    tmp.append(c1)
+                    rngc[j] = (rngp[j-1][0]+1,tmp)
+            else :
+                if i == 0:
+                    rngc[j] = (0,[])
+                elif j == 0:
+                    rngc[j] = rngp[j]
+                else :
+                    if rngc[j-1][0] > rngp[j][0] :
+                        rngc[j] = rngc[j-1]
+                    else :
+                        rngc[j]= rngp[j]
+
+    return _lcs(*rngc[-1])
