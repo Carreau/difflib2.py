@@ -10,6 +10,12 @@ what you will diff is either source-code or string.
 Acronyms : lcs/LCS - Longest common subsequence.
 """
 
+from collections import namedtuple
+from difflib import Match
+#Match = namedtuple('Match', 'a b size')
+
+# yield each row of the matrix
+
 
 def lcs_matrix(s1, s2):
     """ Compute the lcs matrix for s1 vs s2
@@ -108,6 +114,8 @@ def backtrack(C, X, Y):
     C : lcs matrix
     X : sequence 1
     Y : sequence 2
+
+    return list of pairs of index in s1 and s2 of the ith character of the lcs.
     
     Again, not the more efficient if you are interested in the lcs.
     """
@@ -163,38 +171,174 @@ def lcs(s1, s2):
     return lcs
 
 
-from collections import namedtuple
 
-_lcs = namedtuple('LCS',('length','lcs'))
+_lcs = namedtuple('LCS',('length','lcs','cdel'))
 
-def lcs_low_m_anlcs(s1, s2):
+def _lcs_low_m_anlcs(s1, s2):
     """compute the lcs len, and one of the lcs at the same time"""
     
-    m = len(s1)
-    n = len(s2)
+    lens2 = len(s2)
     
-    rngc = [None for x in range(n)] ## current row
-    rngp = [None for x in range(n)] ## previous row
+    rngc = [None for x in range(lens2)] ## current row
+    rngp = [None for x in range(lens2)] ## previous row
     
     for i,c1 in enumerate(s1):
         rngc, rngp = rngp, rngc
         for j,c2 in enumerate(s2):
             if c1 == c2 :
                 if i == 0 or j == 0:
-                    rngc[j] = (1,[c1])
+                    rngc[j] = (1,[c1],[(i,j)])
                 else:
                     tmp = list(rngp[j-1][1])
                     tmp.append(c1)
-                    rngc[j] = (rngp[j-1][0]+1,tmp)
+                    tmp2 = list(rngp[j-1][2])
+                    tmp2.append((i,j))
+                    rngc[j] = (rngp[j-1][0]+1,tmp,tmp2)
             else :
-                if i == 0:
-                    rngc[j] = (0,[])
+                if i == 0 :
+                    t = [(None,u) for u in xrange(j+1)]
+                    p = [(0,None)]
+                    p.extend(t)
+                    rngc[j] = (0,[],p)
                 elif j == 0:
-                    rngc[j] = rngp[j]
+                    tmp2 = list(rngp[j][2])
+                    tmp2.append((i,None))
+                    rngc[j] = rngp[j][0],rngp[j][1],tmp2
                 else :
                     if rngc[j-1][0] > rngp[j][0] :
-                        rngc[j] = rngc[j-1]
+                        tmp2 = list(rngc[j-1][2])
+                        tmp2.append((None,j))
+                        rngc[j] = rngc[j-1][0],rngc[j-1][1],tmp2
                     else :
-                        rngc[j]= rngp[j]
+                        tmp3 = list(rngp[j][2])
+                        tmp3.append((i,None))
+                        rngc[j]= rngp[j][0],rngp[j][1],tmp3
+        yield rngc
 
+def lcs_low_m_anlcs(s1, s2):
+    rngc = None
+    for item in _lcs_low_m_anlcs(s1, s2):
+        rngc = item
     return _lcs(*rngc[-1])
+
+
+def groupper(seq):
+    """
+    slicify a sequence of int
+
+    Example (- use to note demarcations)
+
+    1,2,3, -, 6,7,8 -, 11,12,13,14,15
+
+    will become
+
+    (1,3),(6,8),(11,15)
+    """
+    groupped = [seq[0]]
+    prev = seq[0]
+    for s in seq[1:]:
+        if s != prev+1:
+            groupped.extend((prev, s))
+        prev = s
+    groupped.append(prev)
+    return zip(*[iter(groupped)]*2)
+
+
+def itergroup(seq):
+    """
+    lazily slicify a sequence of int
+
+    Example (- use to note demarcations)
+
+    1,2,3, -, 6,7,8 -, 11,12,13,14,15
+
+    will become
+
+    (1,3),(6,8),(11,15)
+    """
+    seq = iter(seq)
+    start = next(seq)
+    prev = start
+    for elem in seq:
+        if prev+1 != elem:
+            yield start,prev
+            start = elem
+        prev = elem
+    yield start,prev
+
+
+def match_itergroup(seqtuple):
+    seq = iter(seqtuple)
+    start = next(seq)
+    prev = start
+    for elem in seq:
+        if tuple(map(lambda x:x+1 if x is not None else x,prev)) != elem:
+            yield tuple(zip(start,prev))
+            start = elem
+        prev = elem
+    yield tuple(zip(start,prev))
+
+def make_matches(seq):
+    """Group the diffmap in chunck 
+    
+    Match/Left/Right
+    """
+    for s in list(seq):
+        if None in s[0]:
+            yield Left(s[1][0], s[1][1]-s[1][0]+1)
+        elif None in s[1]:
+            yield Right(s[0][0],s[0][1]-s[0][0]+1)
+        else :
+            yield Match(s[0][0],s[1][0],s[0][1]-s[0][0]+1)
+    # yield a last Match from drop in compat wit difflib.
+    
+    
+def leftify(seq):
+    for s in seq :
+        if type(s) is Left:
+            yield Phl(s.pos,s.size)
+        elif type(s) is Right:
+            yield Del(*s)
+        elif type(s) is Match:
+            yield Id(s.a, s.size)
+            
+def rightify(seq):
+    for s in seq :
+        if type(s) is Right:
+            yield Phl(s.pos,s.size)
+        elif type(s) is Left:
+            yield Del(*s)
+        elif type(s) is Match:
+            yield Id(s.b, s.size)
+
+from IPython.display import HTML
+def ashtml(seq, seq_m, target=0):
+    s = ''
+    for subs in seq_m:
+        if type(subs) is Del :
+            s+= '<span style="background-color:#F99">'+seq[subs.pos:subs.pos+subs.size]+'</span>'
+        elif type(subs) is Add :
+            s+= '<span style="background-color:#9F9;">'+seq[subs.pos:subs.pos+subs.size]+'</span>'
+        elif type(subs) is Phl :
+            pass
+            s+= '<span style="background-color:#F5F5FF;">'+u' '*subs.size+'</span>'
+        elif type(subs) is Nil :
+            pass
+        if type(subs) is Id :
+            s+= '<span style="color:;">'+seq[subs.pos:subs.pos+subs.size]+'</span>'
+    return HTML('<pre>'+s+'</pre>')
+        
+Del = namedtuple('Del','pos size')
+Delta = namedtuple('Delta','pos size')
+Left = namedtuple('Left','pos size')
+Right = namedtuple('Right','pos size')
+Add = namedtuple('Add','pos size')
+Phl = namedtuple('Placeholder','pos size')
+Nil = namedtuple('Nil','pos size')
+Id = namedtuple('ID','pos size') 
+
+
+def linediff(s1,s2):
+    m = make_matches(match_itergroup(lcs_low_m_anlcs(s1,s2).cdel))
+    ll = list(m)
+    return ashtml(s1, leftify(ll)),ashtml(s2, rightify(ll))
