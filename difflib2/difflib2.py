@@ -15,6 +15,10 @@ from difflib import Match
 #Match = namedtuple('Match', 'a b size')
 
 # yield each row of the matrix
+try :
+    from IPython.display import HTML
+except :
+    pass
 
 
 def lcs_matrix(s1, s2):
@@ -311,7 +315,6 @@ def rightify(seq):
         elif type(s) is Match:
             yield Id(s.b, s.size)
 
-from IPython.display import HTML
 def ashtml(seq, seq_m, target=0):
     s = ''
     for subs in seq_m:
