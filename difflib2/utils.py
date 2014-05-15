@@ -116,3 +116,13 @@ Cras venenatis quam tortor, a sodales urna laoreet id. Donec faucibus, ante in t
 
 Suspendisse interdum sapien et tristique eleifend. Quisque venenatis justo a mauris vestibulum dapibus. Quisque ornare posuere blandit. Sed vel eros tempus, sollicitudin massa eget, adipiscing libero. Sed vel dictum erat. Etiam eleifend mi non erat rhoncus mattis. Nam et dolor vitae sem suscipit rhoncus. Praesent quis rhoncus tellus. Praesent ut turpis dolor amet."""
 
+
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
+from IPython.display import HTML
+import io
+
+def hl(name):
+    with io.open(name) as f:
+        return HTML(highlight(f.read(), PythonLexer(), HtmlFormatter(noclasses=True)))
