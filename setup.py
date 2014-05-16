@@ -1,26 +1,48 @@
-from setuptools import setup, find_packages
 import sys, os
 
-version = '0.0'
 
-setup(name='difflib2',
-      version=version,
-      description="A surpriseless alternative to difflib",
-      long_description="""\
-If you prefer a difflib that is developper friendly instead of visualy pleasant for the end user and are disapointed by difflib, difflib2 is for you""",
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
-      keywords='diff, levenstein, longuestcommon subsequence, python2, distances',
-      author='Bussonnier Matthias',
-      author_email='bussonniermatthias@gmail.com',
-      url='',
-      license='BSD',
-      packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-      include_package_data=True,
-      zip_safe=True,
-      install_requires=[
-          # -*- Extra requirements: -*-
-      ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
-      )
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
+readme = open('README.rst').read()
+requirements = [
+    # TODO: put package requirements here
+]
+test_requirements = [
+    # TODO: put package test requirements here
+]
+
+setup(
+    name='difflib2',
+    version='0.1.0',
+    description='Difflib2, a sane replacement for Python difflib',
+    long_description=readme + '\n\n',
+    author='Matthias Bussonnier',
+    author_email='bussonniermatthias@gmail.com',
+    url='https://github.com/carreau/difflib2',
+    packages=[
+        'difflib2',
+    ],
+    package_dir={'difflib2':
+                 'difflib2'},
+    include_package_data=True,
+    install_requires=requirements,
+    license="BSD",
+    zip_safe=False,
+    keywords='difflib2, diff, levenstein, longuestcommon subsequence, python2, distances',
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Natural Language :: English',
+        "Programming Language :: Python :: 2",
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+    ],
+    test_suite='tests',
+    tests_require=test_requirements
+)
