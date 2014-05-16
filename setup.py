@@ -24,6 +24,7 @@ setup(
     url='https://github.com/carreau/difflib2',
     packages=[
         'difflib2',
+        'tests'
     ],
     package_dir={'difflib2':
                  'difflib2'},
