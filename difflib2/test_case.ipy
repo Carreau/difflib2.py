@@ -13,7 +13,7 @@ def test_case(case, r=3, nt=3, agree=True, ldict=None):
     dl = pd.DataFrame()
     # warmup
 #    %timeit -o -r{r} -n{nt} -q lcsmatrix(s1,s2)
-    for func in gdict.values():
+    for func in ldict.values():
         # the way timeit work, we need to use a global
         global fn 
         fn = func
@@ -30,6 +30,7 @@ def test_case(case, r=3, nt=3, agree=True, ldict=None):
     fig.set_figwidth(2*fig.get_figwidth())
     df.boxplot(ax=ax)
     ax.set_ylabel('time (s), lower is better')
+    ax.set_ylim(0)
     try:
         ax.set_title(name+' lenght:%d,%d' % (len(s1),len(s2)))
     except:
@@ -39,4 +40,5 @@ def test_case(case, r=3, nt=3, agree=True, ldict=None):
 
     dl.boxplot(ax=ax2)
     ax2.set_ylabel('calculated LCS length')
+    ax2.set_ylim(0)
     pass

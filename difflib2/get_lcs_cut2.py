@@ -68,11 +68,13 @@ def get_lcs_cut2(s1, s2, lcs_low_bound=0, bg=None, debug=False):
         if i < mini:
             print('skip i=',i)
             continue
+        
+        
         isl = islice(s2,limm,limp)
         rsl = range(limm,limp)
         zsl = zip(rsl,isl)
         for j,c2 in zsl:
-            if c1 == c2 :
+            if c1 == c2 : 
                 rngc_lcs[j] = ((i,j),rngp_lcs[j-1])
                 if i == 0 or j == 0:
                     newval = 1
@@ -122,6 +124,6 @@ def get_lcs_cut2(s1, s2, lcs_low_bound=0, bg=None, debug=False):
                 else :
                     newval = b
                     rngc_lcs[j] = rngp_lcs[j]
-                newval = rngcjm if rngcjm > b else b
             rngc[j] = rngcjm  = newval
-    return rngc[-2]#,rngc_lcs[-2]
+    return rngc[-2]
+    return rngc[-2],rngc_lcs[-2]

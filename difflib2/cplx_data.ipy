@@ -1,0 +1,39 @@
+import numpy as np
+from copy import copy
+func =  None
+lnt = None
+def cplx_data(case , funcs, r=5, nt=10,npoints=50, mix=None):
+    ldict = funcs
+    #ldict  = {k:v for k,v in gdict.items() if k not in {'lcsmatrix','lcs_low_m','lcs_len3','lcs_low_ma','lcs_cut','lcs_cut3'}}
+    xx = sorted(list(set(map(int, np.logspace(1.2,case[2],npoints)))))
+    seed1 = case[0]
+    seed2 = case[1]
+    df = pd.DataFrame(index=xx, columns=ldict.keys())
+    dr = pd.DataFrame(index=xx, columns=ldict.keys())
+    global func
+    global lnt
+    global s1
+    global s2
+    for func in ldict.values():
+        #fig, ax = subplots()
+        print('\ntesting ', func.__name__,' '*(15-len(func.__name__)),end='')
+        for n in df.index:#,3,5,10,20]:
+            print('.',end='')
+            
+            s1 = ((seed1)*(n//len(seed1)+1))[0:n]
+            s2 = ((seed2)*(n//len(seed2)+1))[0:n]
+            if mix is not None:
+                s2 = [c for c in s2]
+                for pos in [x*mix for x in range(len(s2)//mix)]:
+                    s2[pos] = '-'
+    #        s2 = ''.join(s2)
+    #        s1 = ("abcdefghijklmnop"*1000)[0:n]
+    #        s2 = ("abcdefghijklmnox"*1000)[0:n]
+            lnt = 1000//n**2+1
+            u  = %timeit -o -r{r} -n{lnt} -q func(s1,s2)
+            df[func.__name__].ix[n] = np.mean(u.all_runs)/lnt
+            try:
+                dr[func.__name__].ix[n] = func(s1,s2)/lcs_cut2(s1,s2)
+            except ZeroDivisionError:
+                dr[func.__name__].ix[n] = 0
+    return df,dr
