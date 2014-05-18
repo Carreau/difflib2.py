@@ -21,7 +21,11 @@ class TestDifflib2(unittest.TestCase):
 
     def test_something(self):
         for case in utils.test_cases :
-            assert()
+            s1,s2,l = case
+            r1 = func(s1,s2)
+            r2 = func(s2,s1)
+            assert(r1 == l)
+            assert(r2 == l)
         pass
 
     def tearDown(self):
