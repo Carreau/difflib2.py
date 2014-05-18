@@ -13,25 +13,27 @@ import unittest
 from difflib2 import difflib2
 import difflib2.utils as utils
 from difflib2.get_lcs_cut2 import get_lcs_cut2
+from difflib2.low_m import low_m
+from difflib2.low_ma import low_ma
 
 
-class TestDifflib2(unittest.TestCase):
 
-    def setUp(self):
-        pass
-
-    def test_something(self):
-        for case in utils.test_cases :
+def test_something(self):
+    for case in utils.test_cases :
+        for func in [get_lcs_cut2, low_m, low_ma]:
             func = get_lcs_cut2
             s1,s2,l = case
             r1 = func(s1,s2)
+            assert(False)
             r2 = func(s2,s1)
-            assert(r1 == l)
-            assert(r2 == l)
-        pass
+            yield assert_sym, fun,s1,s2
+            yield assert_correct, fun,s1,s2,l
 
-    def tearDown(self):
-        pass
+def assert_sym(fun, s1,s2):
+    assert(fun(s1,s2) == fun(s2,s1))
+
+def assert_correct(fun, s1, s2 ,l):
+    assert(fun(s1,s2)==l)
 
 if __name__ == '__main__':
     unittest.main()
