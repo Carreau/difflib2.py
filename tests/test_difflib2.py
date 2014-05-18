@@ -12,6 +12,7 @@ import unittest
 
 from difflib2 import difflib2
 import difflib2.utils as utils
+from difflib2.get_lcs_cut2 import get_lcs_cut2
 
 
 class TestDifflib2(unittest.TestCase):
@@ -21,6 +22,7 @@ class TestDifflib2(unittest.TestCase):
 
     def test_something(self):
         for case in utils.test_cases :
+            func = get_lcs_cut2
             s1,s2,l = case
             r1 = func(s1,s2)
             r2 = func(s2,s1)
