@@ -56,6 +56,7 @@ def opt_common_char(func):
         s22 = [c for c in s2 if c in s]
 #        print('will pass ',s11, s22, 'instead of ', s1, s2)
         return func(s11,s22,*args, **kwargs)
+    closure._wrapped = func
     return closure
         
 def rem_common_extrem(func):
@@ -75,6 +76,7 @@ def rem_common_extrem(func):
                 else:
                     break
         return func(ss1,ss2,*args, **kwargs)+delta
+    closure._wrapped = func
     return closure
 
 
