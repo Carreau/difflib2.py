@@ -25,3 +25,27 @@ def test_equal_len():
         both = dl.lcs_low_m_anlcs(s1,s2)
         assert both.length == dl.lcs_len(*ss)
         assert both.length == len(both.lcs)
+
+from difflib2 import difflib2
+import difflib2.utils as utils
+from difflib2.get_lcs_cut2 import get_lcs_cut2
+from difflib2.low_m import lcs_low_m
+from difflib2.low_ma import lcs_low_ma
+
+
+
+def test_something():
+    for case in utils.test_cases :
+        for func in [get_lcs_cut2, lcs_low_m, lcs_low_ma]:
+            func = get_lcs_cut2
+            s1,s2,l = case
+            r1 = func(s1,s2)
+            r2 = func(s2,s1)
+            yield assert_sym, func,s1,s2
+            yield assert_correct, func,s1,s2,l
+
+def assert_sym(fun, s1,s2):
+    assert(fun(s1,s2) == fun(s2,s1))
+
+def assert_correct(fun, s1, s2 ,l):
+    assert(fun(s1,s2)==l)
