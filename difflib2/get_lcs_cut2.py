@@ -129,5 +129,5 @@ def _get_lcs_cut2(s1, s2, lcs_low_bound=0, bg=None, debug=False):
     return rngc[-2],rngc_lcs[-2]
 
 def get_lcs_cut2(*args, **kwargs):
-    return get_lcs_cut2(*args, **kwargs)[0]
+    return _get_lcs_cut2(*args, **kwargs)[0]
 
