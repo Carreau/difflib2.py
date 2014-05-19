@@ -2,7 +2,7 @@ from __future__ import print_function
 from array import array
 from itertools import islice
 
-def get_lcs_cut2(s1, s2, lcs_low_bound=0, bg=None, debug=False):
+def _get_lcs_cut2(s1, s2, lcs_low_bound=0, bg=None, debug=False):
     """Compule the length of the LCS 2 sequences s1 and s2.
     
     lcs_low_bound : (int), hint of lower bound for the lenght of the lcs
@@ -125,5 +125,9 @@ def get_lcs_cut2(s1, s2, lcs_low_bound=0, bg=None, debug=False):
                     newval = b
                     rngc_lcs[j] = rngp_lcs[j]
             rngc[j] = rngcjm  = newval
-    return rngc[-2]
+    #return rngc[-2]
     return rngc[-2],rngc_lcs[-2]
+
+def get_lcs_cut2(*args, **kwargs):
+    return get_lcs_cut2(*args, **kwargs)[0]
+
